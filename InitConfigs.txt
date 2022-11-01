@@ -1,0 +1,4 @@
+// Gera o diagrama ERD
+npm i prisma-erd-generator @mermaid-js/mermaid-cli -D
+npx prisma generate
+npm i @fastify/cors

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
+// Realiza a conexão com o banco
 const prisma = new PrismaClient({});
 
 async function main() {

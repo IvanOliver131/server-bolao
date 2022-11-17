@@ -33,6 +33,7 @@ model Participant {
   user    User    @relation(fields: [userId], references: [id])
   pool    Pool    @relation(fields: [poolId], references: [id])
 
+  // Usamos isso pois os ID's nunca iram se repetir
   @@unique([userId, poolId])
 }
 

@@ -1,4 +1,14 @@
 // Gera o diagrama ERD
 npm i prisma-erd-generator @mermaid-js/mermaid-cli -D
-npx prisma generate
 npm i @fastify/cors
+
+//
+npm i short-unique-id
+
+// biblioteca de validação
+npm i zod
+
+// Comandos prisma
+npx prisma studio 
+npx prisma generate
+npx prisma migrate dev

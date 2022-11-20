@@ -1,15 +1,20 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { PrismaClient } from "@prisma/client";
-import { z } from "zod";
-import ShortUniqueId from "short-unique-id";
+import jwt from "@fastify/jwt";
+import * as dotenv from "dotenv";
 
-// Realiza a conexão com o banco
-const prisma = new PrismaClient({
-  log: ["query"],
-});
+import { poolRoutes } from "./routes/pool";
+import { guessRoutes } from "./routes/guess";
+import { userRoutes } from "./routes/user";
+import { authRoutes } from "./routes/auth";
+import { gameRoutes } from "./routes/game";
+
+// BOLÃO É POLL - REMEMBER
 
 async function bootstrap() {
+  dotenv.config(); // Load the environment variables
+  const secretJwt = process.env.SECRET_JWT;
+
   const fastify = Fastify({
     logger: true,
   });
@@ -19,46 +24,18 @@ async function bootstrap() {
     origin: true,
   });
 
-  fastify.get("/pools/count", async () => {
-    const pools = await prisma.pool.count();
-
-    return pools;
-  });
-
-  fastify.post("/pools", async (request, reply) => {
-    const createPoolBody = z.object({
-      title: z.string(),
+  // Em produção isso deve ser uma variável de ambiente
+  if (secretJwt) {
+    await fastify.register(jwt, {
+      secret: secretJwt,
     });
+  }
 
-    try {
-      const { title } = createPoolBody.parse(request.body);
-      const generate = new ShortUniqueId({ length: 6 });
-      const code = String(generate()).toUpperCase();
-
-      await prisma.pool.create({
-        data: {
-          title,
-          code,
-        },
-      });
-
-      return reply.status(201).send({ code, msg: "Bolão criado com sucesso!" });
-    } catch (error) {
-      return reply.send({ msg: "Erro ao criar bolão!" });
-    }
-  });
-
-  fastify.get("/users/count", async () => {
-    const users = await prisma.user.count();
-
-    return users;
-  });
-
-  fastify.get("/guesses/count", async () => {
-    const guesses = await prisma.guess.count();
-
-    return guesses;
-  });
+  await fastify.register(authRoutes);
+  await fastify.register(gameRoutes);
+  await fastify.register(guessRoutes);
+  await fastify.register(poolRoutes);
+  await fastify.register(userRoutes);
 
   await fastify.listen({ port: 3333, host: "0.0.0.0" });
 }

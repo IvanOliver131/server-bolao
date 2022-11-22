@@ -75,7 +75,7 @@ export async function guessRoutes(fastify: FastifyInstance) {
 
       if (game.date < new Date()) {
         return reply.status(400).send({
-          message: "You cannot send guesses after the game date.",
+          message: "You can't sent a guess after the game date.",
         });
       }
 
